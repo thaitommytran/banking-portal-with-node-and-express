@@ -13,6 +13,9 @@ app.set("view engine", "ejs");
 // Configure the Static Directory
 app.use(express.static(path.join(__dirname, "public")));
 
+// URL Encoded Middleware
+app.use(express.urlencoded({ extended: true }));
+
 // Read Account Data
 const accountData = fs.readFileSync(`${__dirname}/json/accounts.json`, "utf8");
 const accounts = JSON.parse(accountData);
@@ -55,6 +58,43 @@ app.get("/credit", (req, res) => {
 app.get("/profile", (req, res) => {
   res.render("profile", {
     user: users[0]
+  });
+});
+
+// Create the Transfer GET Route
+app.get("/transfer", (req, res) => {
+  res.render("transfer");
+});
+
+// Create the Transfer POST Route
+app.post("/transfer", (req, res) => {
+  // Calculate and Set the From Balance
+  accounts[req.body.from].balance -= req.body.amount;
+  // Calculate and Set the To Balance
+  accounts[req.body.to].balance += parseInt(req.body.amount, 10);
+  // Convert Account Data to JSON
+  const accountsJSON = JSON.stringify(accounts, null, 4);
+  // Write Account Data to JSON file
+  fs.writeFileSync(path.join(__dirname,'json/accounts.json'), accountsJSON, "utf8");
+  // Redirect with a Message
+  res.render("transfer", { message: "Transfer Completed" });
+});
+
+// Add Payment Feature
+app.get("/payment", (req, res) => {
+  res.render("payment", {
+    account: accounts.credit
+  });
+});
+
+app.post("/payment", (req, res) => {
+  accounts.credit.balance -= req.body.amount;
+  accounts.credit.available += parseInt(req.body.amount, null, 10);
+  const accountsJSON = JSON.stringify(accounts, null, 4);
+  fs.writeFileSync(path.join(__dirname,'json/accounts.json'), accountsJSON, "utf8");
+  res.render("payment", {
+    message: "Payment Successful",
+    account: accounts.credit
   });
 });
 
