@@ -43,7 +43,7 @@ app.get("/", (req, res) => {
 });
 
 // Use the Account Routes
-app.use("/account", accountRoutes);
+app.use("/account", accountRoutes());
 
 // // Create the Savings Account Route
 // app.get("/savings", (req, res) => {
@@ -79,7 +79,7 @@ app.get("/profile", (req, res) => {
 // });
 
 // Use the Services Routes
-app.use("/services", servicesRoutes);
+app.use("/services", servicesRoutes());
 
 // // Create the Transfer POST Route
 // app.post("/transfer", (req, res) => {
@@ -122,6 +122,4 @@ app.use("/services", servicesRoutes);
 // });
 
 // Create a Server
-app.listen(3000, () => {
-  console.log("PS Project Running on port 3000!");
-});
+app.listen(3000);
