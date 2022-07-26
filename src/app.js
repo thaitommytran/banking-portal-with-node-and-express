@@ -6,6 +6,9 @@ const path = require("path");
 const express = require("express");
 const app = express();
 
+// Require Data Library
+const { accounts, users, writeJSON } = require("./data");
+
 // Configure the View Directory and Engine
 app.set("views", path.join(__dirname, "./views"));
 app.set("view engine", "ejs");
@@ -17,12 +20,12 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 
 // Read Account Data
-const accountData = fs.readFileSync(`${__dirname}/json/accounts.json`, "utf8");
-const accounts = JSON.parse(accountData);
+// const accountData = fs.readFileSync(`${__dirname}/json/accounts.json`, "utf8");
+// const accounts = JSON.parse(accountData);
 
-// Read User Data
-const userData = fs.readFileSync(`${__dirname}/json/users.json`, "utf8");
-const users = JSON.parse(userData);
+// // Read User Data
+// const userData = fs.readFileSync(`${__dirname}/json/users.json`, "utf8");
+// const users = JSON.parse(userData);
 
 // Create the Index Route
 // Update the Index Route
@@ -72,10 +75,8 @@ app.post("/transfer", (req, res) => {
   accounts[req.body.from].balance -= req.body.amount;
   // Calculate and Set the To Balance
   accounts[req.body.to].balance += parseInt(req.body.amount, 10);
-  // Convert Account Data to JSON
-  const accountsJSON = JSON.stringify(accounts, null, 4);
-  // Write Account Data to JSON file
-  fs.writeFileSync(path.join(__dirname,'json/accounts.json'), accountsJSON, "utf8");
+  // Function Call Transfer
+  writeJSON();
   // Redirect with a Message
   res.render("transfer", { message: "Transfer Completed" });
 });
@@ -90,8 +91,8 @@ app.get("/payment", (req, res) => {
 app.post("/payment", (req, res) => {
   accounts.credit.balance -= req.body.amount;
   accounts.credit.available += parseInt(req.body.amount, null, 10);
-  const accountsJSON = JSON.stringify(accounts, null, 4);
-  fs.writeFileSync(path.join(__dirname,'json/accounts.json'), accountsJSON, "utf8");
+  // Function Call Payments
+  writeJSON();
   res.render("payment", {
     message: "Payment Successful",
     account: accounts.credit
